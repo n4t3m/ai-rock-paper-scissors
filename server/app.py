@@ -2,8 +2,8 @@
 
 from flask import Flask
 from src.routes import rps_routes
+from src.models import User
 from config import FlaskConfig, db
-
 
 def create_app():
     '''Initialize Flask App'''
@@ -22,8 +22,13 @@ def create_app():
         # create db based on imported models
         db.create_all()
 
+        db.session.add(User(
+            username="admin",
+            password="password",
+        ))
+
         # Create Sample Data Here
-        # db.session.commit()
+        db.session.commit()
 
     return app
 

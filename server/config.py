@@ -10,5 +10,5 @@ class FlaskConfig:
     # SERVER_NAME = "localhost.localdomain"
     SECRET_KEY = urandom(32).hex()
 
-    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
