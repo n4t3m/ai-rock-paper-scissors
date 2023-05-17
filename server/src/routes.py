@@ -1,6 +1,6 @@
 '''This module contains API calls for the RPS Game'''
 
-from flask import Blueprint, session
+from flask import Blueprint, session, abort
 from src.util import hello_world
 from src.decorators import login_required
 
@@ -16,6 +16,14 @@ def login():
     '''Simple "Login" Route'''
     session['username']="Guest"
     return "You have been logged in!"
+
+@rps_routes.route("/logout", methods=["GET"])
+def logout():
+    '''Simple "Logout" Route'''
+    if "username" in session:
+        del session["username"]
+        return "You have been logged out!"
+    return abort(401)
 
 @rps_routes.route("/auth_check", methods=["GET"])
 @login_required
