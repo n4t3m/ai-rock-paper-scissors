@@ -2,17 +2,35 @@
 
 from flask import Flask
 from src.routes import rps_routes
+from src.models import User
+from config import FlaskConfig, db
 
 def create_app():
     '''Initialize Flask App'''
-    _app = Flask(__name__)
-    _app.register_blueprint(rps_routes)
+    # Initialize Flask
+    app = Flask(__name__)
+    app.config.from_object(FlaskConfig)
 
-    #with app.app_context():
-        # create handlers
-        # create db connections
+    #print(app.config)
 
-    return _app
+    # Register API Routes
+    app.register_blueprint(rps_routes)
+
+    # Initialize DB
+    db.init_app(app)
+    with app.app_context():
+        # create db based on imported models
+        db.create_all()
+
+        db.session.add(User(
+            username="admin",
+            password="password",
+        ))
+
+        # Create Sample Data Here
+        db.session.commit()
+
+    return app
 
 
 if __name__ == "__main__":
