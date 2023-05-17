@@ -1,7 +1,8 @@
 '''This module contains API calls for the RPS Game'''
 
-from flask import Blueprint
+from flask import Blueprint, session
 from src.util import hello_world
+from src.decorators import login_required
 
 rps_routes = Blueprint("rps_routes", __name__)
 
@@ -9,3 +10,15 @@ rps_routes = Blueprint("rps_routes", __name__)
 def hello_world_route():
     '''Simple Hello World API Call'''
     return hello_world()
+
+@rps_routes.route("/login", methods=["GET"])
+def login():
+    '''Simple "Login" Route'''
+    session['username']="Guest"
+    return "You have been logged in!"
+
+@rps_routes.route("/auth_check", methods=["GET"])
+@login_required
+def protected_route():
+    '''Simple Auth-Check Route'''
+    return "You are authenticated!"
