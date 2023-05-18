@@ -63,6 +63,9 @@ class MatchHistory(db.Model):
 
     winner = db.Column(db.String(1), default="0")
 
+    player_one_ack = db.Column(db.Boolean, default=False)
+    player_two_ack = db.Column(db.Boolean, default=False)
+
     match_created = db.Column(db.DateTime(), unique=False, default=datetime.now())
 
     def __init__(self, player_one_id, player_two_id):

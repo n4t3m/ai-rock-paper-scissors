@@ -84,11 +84,9 @@ def init_match():
 
     playerOneID = request.form.get("player_one_id")
     if not playerOneID:
-        print("here")
         abort(400)
     playerTwoID = request.form.get("player_two_id")
     if not playerTwoID:
-        print("here2")
         abort(400)
 
     # Ensure Player is not in Match Already
@@ -98,6 +96,8 @@ def init_match():
     res = MatchHistory.query.filter_by(player_two_id=playerTwoID).first()
     if res:
         return "Player 2 Already In Match"
+    
+    # TODO: Check to see if user reporting result was in match
 
     try:
         # Create User in Database
@@ -110,6 +110,46 @@ def init_match():
         return jsonify(
             match_id=m.match_id,
             match_creation_time=m.match_created
+        )
+    except:
+        abort(500)
+
+@rps_routes.route("/report_result", methods=["POST"])
+def report_result_match():
+    '''Match Status Route'''
+
+    # TODO: Use Match ID for this route
+
+    playerOneID = request.form.get("player_one_id")
+    if not playerOneID:
+        abort(400)
+    playerTwoID = request.form.get("player_two_id")
+    if not playerTwoID:
+        abort(400)
+    winner = str(request.form.get("winner"))
+    if not winner or (winner!="1" and winner!="2"):
+        print(winner)
+        abort(400)
+
+    # Ensure Match Exists
+    res = MatchHistory.query.filter(
+        db.or_(
+            db.and_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerTwoID),
+            db.and_(MatchHistory.player_one_id==playerTwoID, MatchHistory.player_two_id==playerOneID)
+        )).first()
+
+    if not res:
+        return "Match Not Found"
+    
+    # TODO: Check to see if user reporting result was in match
+    print("here4")
+
+    try:
+        res.winner = winner
+        db.session.commit()
+        return jsonify(
+            winner=res.winner,
+            match_id=res.match_id,
         )
     except:
         abort(500)
