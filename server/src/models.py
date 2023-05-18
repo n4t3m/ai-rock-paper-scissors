@@ -61,6 +61,18 @@ class MatchHistory(db.Model):
     match_created = db.Column(db.DateTime(), unique=False, default=datetime.now())
 
     def __init__(self, player_one_id, player_two_id):
+
+        player_one = User.query.get(player_one_id)
+        if player_one is None:
+            raise ValueError(f"Invalid player one ID: {player_one_id}")
+
+        # Validate player_two_id
+        player_two = User.query.get(player_two_id)
+        if player_two is None:
+            raise ValueError(f"Invalid player two ID: {player_two_id}")
+
         self.id = uuid4().hex
         self.player_one_id = player_one_id
         self.player_two_id = player_two_id
+        self.player_one_initial_elo = User.query.get(player_one_id).elo
+        self.player_two_initial_elo = User.query.get(player_two_id).elo
