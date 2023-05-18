@@ -3,13 +3,14 @@
 from datetime import datetime
 
 from config import db
+from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
     '''User Table'''
     __tablename__ = "authors"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(32), primary_key=True)
 
     username = db.Column(db.String(32), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
@@ -34,5 +35,6 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __init__(self, username, password):
+        self.id = uuid4().hex
         self.username = username
         self.password_hash = generate_password_hash(password)
