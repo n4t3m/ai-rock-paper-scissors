@@ -3,7 +3,7 @@
 from flask import Blueprint, session, abort, request, jsonify
 
 from config import db
-from src.util import hello_world
+from src.util import calculate_elo_change
 from src.decorators import login_required
 from src.models import User, MatchHistory
 
@@ -90,10 +90,20 @@ def init_match():
         abort(400)
 
     # Ensure Player is not in Match Already
-    res = MatchHistory.query.filter_by(player_one_id=playerOneID).first()
+
+    res = MatchHistory.query.filter(
+        db.and_(
+            db.or_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerOneID),
+            MatchHistory.winner=="0"
+        )).first()
     if res:
         return "Player 1 Already In Match"
-    res = MatchHistory.query.filter_by(player_two_id=playerTwoID).first()
+
+    res = MatchHistory.query.filter(
+        db.and_(
+            db.or_(MatchHistory.player_two_id==playerTwoID, MatchHistory.player_two_id==playerTwoID),
+            MatchHistory.winner=="0"
+        )).first()
     if res:
         return "Player 2 Already In Match"
     
@@ -133,23 +143,34 @@ def report_result_match():
 
     # Ensure Match Exists
     res = MatchHistory.query.filter(
-        db.or_(
-            db.and_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerTwoID),
-            db.and_(MatchHistory.player_one_id==playerTwoID, MatchHistory.player_two_id==playerOneID)
-        )).first()
+        db.and_(
+            db.or_(
+                db.and_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerTwoID),
+                db.and_(MatchHistory.player_one_id==playerTwoID, MatchHistory.player_two_id==playerOneID)
+            )),
+            MatchHistory.winner=="0"
+        ).first()
 
     if not res:
         return "Match Not Found"
     
     # TODO: Check to see if user reporting result was in match
-    print("here4")
 
     try:
         res.winner = winner
+        res.player_one_final_elo, res.player_two_final_elo = calculate_elo_change(res.player_one_initial_elo, res.player_two_initial_elo, winner)
+        User.query.filter_by(id=playerOneID).first().elo = res.player_one_final_elo
+        User.query.filter_by(id=playerTwoID).first().elo = res.player_two_final_elo
         db.session.commit()
         return jsonify(
             winner=res.winner,
             match_id=res.match_id,
+            p1_username=User.query.get(playerOneID).username,
+            p1_old_elo=res.player_one_initial_elo,
+            p1_updated_elo=res.player_one_final_elo,
+            p2_username=User.query.get(playerTwoID).username,
+            p2_old_elo=res.player_two_initial_elo,
+            p2_updated_elo=res.player_two_final_elo,
         )
     except:
         abort(500)
