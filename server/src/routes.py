@@ -5,7 +5,7 @@ from flask import Blueprint, session, abort, request
 from config import db
 from src.util import hello_world
 from src.decorators import login_required
-from src.models import User
+from src.models import User, MatchHistory
 
 rps_routes = Blueprint("rps_routes", __name__)
 
@@ -77,3 +77,27 @@ def logout():
 def protected_route():
     '''Simple Auth-Check Route'''
     return "You are authenticated!"
+
+@rps_routes.route("/init_match", methods=["POST"])
+def init_match():
+    '''Registration Route'''
+    playerOneID = request.form.get("player_one_id")
+    if not playerOneID:
+        print("here")
+        abort(400)
+    playerTwoID = request.form.get("player_two_id")
+    if not playerTwoID:
+        print("here2")
+        abort(400)
+
+    try:
+        # Create User in Database
+        m = MatchHistory(
+            player_one_id=playerOneID,
+            player_two_id=playerTwoID,
+        )
+        db.session.add(m)
+        db.session.commit()
+        return f"Match {m.match_id} successfully created!"
+    except:
+        abort(500)
