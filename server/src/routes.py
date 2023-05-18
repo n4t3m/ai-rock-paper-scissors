@@ -1,11 +1,11 @@
 '''This module contains API calls for the RPS Game'''
 
-from flask import Blueprint, session, abort, request
+from flask import Blueprint, session, abort, request, jsonify
 
 from config import db
-from src.util import hello_world
+from src.util import calculate_elo_change
 from src.decorators import login_required
-from src.models import User
+from src.models import User, MatchHistory
 
 rps_routes = Blueprint("rps_routes", __name__)
 
@@ -77,3 +77,100 @@ def logout():
 def protected_route():
     '''Simple Auth-Check Route'''
     return "You are authenticated!"
+
+@rps_routes.route("/init_match", methods=["POST"])
+def init_match():
+    '''Registration Route'''
+
+    playerOneID = request.form.get("player_one_id")
+    if not playerOneID:
+        abort(400)
+    playerTwoID = request.form.get("player_two_id")
+    if not playerTwoID:
+        abort(400)
+
+    # Ensure Player is not in Match Already
+
+    res = MatchHistory.query.filter(
+        db.and_(
+            db.or_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerOneID),
+            MatchHistory.winner=="0"
+        )).first()
+    if res:
+        return "Player 1 Already In Match"
+
+    res = MatchHistory.query.filter(
+        db.and_(
+            db.or_(MatchHistory.player_two_id==playerTwoID, MatchHistory.player_two_id==playerTwoID),
+            MatchHistory.winner=="0"
+        )).first()
+    if res:
+        return "Player 2 Already In Match"
+    
+    # TODO: Check to see if user reporting result was in match
+
+    try:
+        # Create User in Database
+        m = MatchHistory(
+            player_one_id=playerOneID,
+            player_two_id=playerTwoID,
+        )
+        db.session.add(m)
+        db.session.commit()
+        return jsonify(
+            match_id=m.match_id,
+            match_creation_time=m.match_created
+        )
+    except:
+        abort(500)
+
+@rps_routes.route("/report_result", methods=["POST"])
+def report_result_match():
+    '''Match Status Route'''
+
+    # TODO: Use Match ID for this route
+
+    playerOneID = request.form.get("player_one_id")
+    if not playerOneID:
+        abort(400)
+    playerTwoID = request.form.get("player_two_id")
+    if not playerTwoID:
+        abort(400)
+    winner = str(request.form.get("winner"))
+    if not winner or (winner!="1" and winner!="2"):
+        print(winner)
+        abort(400)
+
+    # Ensure Match Exists
+    res = MatchHistory.query.filter(
+        db.and_(
+            db.or_(
+                db.and_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerTwoID),
+                db.and_(MatchHistory.player_one_id==playerTwoID, MatchHistory.player_two_id==playerOneID)
+            )),
+            MatchHistory.winner=="0"
+        ).first()
+
+    if not res:
+        return "Match Not Found"
+    
+    # TODO: Check to see if user reporting result was in match
+
+    try:
+        res.winner = winner
+        res.player_one_final_elo, res.player_two_final_elo = calculate_elo_change(res.player_one_initial_elo, res.player_two_initial_elo, winner)
+        User.query.filter_by(id=playerOneID).first().elo = res.player_one_final_elo
+        User.query.filter_by(id=playerTwoID).first().elo = res.player_two_final_elo
+        db.session.commit()
+        return jsonify(
+            winner=res.winner,
+            match_id=res.match_id,
+            p1_username=User.query.get(playerOneID).username,
+            p1_old_elo=res.player_one_initial_elo,
+            p1_updated_elo=res.player_one_final_elo,
+            p2_username=User.query.get(playerTwoID).username,
+            p2_old_elo=res.player_two_initial_elo,
+            p2_updated_elo=res.player_two_final_elo,
+        )
+    except:
+        abort(500)
