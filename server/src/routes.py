@@ -81,6 +81,7 @@ def protected_route():
 @rps_routes.route("/init_match", methods=["POST"])
 def init_match():
     '''Registration Route'''
+
     playerOneID = request.form.get("player_one_id")
     if not playerOneID:
         print("here")
@@ -89,6 +90,14 @@ def init_match():
     if not playerTwoID:
         print("here2")
         abort(400)
+
+    # Ensure Player is not in Match Already
+    res = MatchHistory.query.filter_by(player_one_id=playerOneID).first()
+    if res:
+        return "Player 1 Already In Match"
+    res = MatchHistory.query.filter_by(player_two_id=playerTwoID).first()
+    if res:
+        return "Player 2 Already In Match"
 
     try:
         # Create User in Database

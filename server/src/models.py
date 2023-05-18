@@ -79,8 +79,8 @@ class MatchHistory(db.Model):
         self.match_id = uuid4().hex
         self.player_one_id = player_one_id
         self.player_two_id = player_two_id
-        player_one_final_elo = None
-        player_two_final_elo = None
+        self.player_one_final_elo = None
+        self.player_two_final_elo = None
         self.player_one_initial_elo = User.query.get(player_one_id).elo
         self.player_two_initial_elo = User.query.get(player_two_id).elo
         self.winner = "0"
