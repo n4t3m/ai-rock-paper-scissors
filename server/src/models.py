@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
     '''User Table'''
-    __tablename__ = "authors"
+    __tablename__ = "users"
 
     id = db.Column(db.String(32), primary_key=True)
 
@@ -17,6 +17,11 @@ class User(db.Model):
 
     register_date = db.Column(db.DateTime(), unique=False, default=datetime.now())
     admin = db.Column(db.Boolean, default=False)
+
+    elo = db.Column(db.Integer, unique=False, nullable=False)
+
+    matches_as_player_one = db.relationship('MatchHistory', backref='player_one', foreign_keys='MatchHistory.player_one_id', lazy=True)
+    matches_as_player_two = db.relationship('MatchHistory', backref='player_two', foreign_keys='MatchHistory.player_two_id', lazy=True)
 
     avatar = db.Column(db.String(64), unique=False, nullable=True, default=None)
 
@@ -38,3 +43,24 @@ class User(db.Model):
         self.id = uuid4().hex
         self.username = username
         self.password_hash = generate_password_hash(password)
+        self.elo = 1000
+
+class MatchHistory(db.Model):
+    '''Match History Table'''
+    __tablename__ = "matchhistory"
+
+    match_id = db.Column(db.String(32), primary_key=True)
+
+    # Many to One Relationship
+    player_one_id = db.Column(db.String(32), db.ForeignKey('users.id'), nullable=False)
+    player_two_id = db.Column(db.String(32), db.ForeignKey('users.id'), nullable=False)
+
+    player_one_initial_elo = db.Column(db.Integer)
+    player_two_initial_elo = db.Column(db.Integer)
+
+    match_created = db.Column(db.DateTime(), unique=False, default=datetime.now())
+
+    def __init__(self, player_one_id, player_two_id):
+        self.id = uuid4().hex
+        self.player_one_id = player_one_id
+        self.player_two_id = player_two_id
