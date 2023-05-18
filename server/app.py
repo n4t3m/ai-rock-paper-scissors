@@ -27,8 +27,21 @@ def create_app():
             password="password",
         ))
 
+        db.session.add(User(
+            username="nano_one",
+            password="password123",
+        ))
+
+        db.session.add(User(
+            username="nano_two",
+            password="password123",
+        ))
+
         # Create Sample Data Here
         db.session.commit()
+
+        # Create handlers to be used
+
 
     return app
 
