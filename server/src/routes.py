@@ -1,6 +1,6 @@
 '''This module contains API calls for the RPS Game'''
 
-from flask import Blueprint, session, abort, request
+from flask import Blueprint, session, abort, request, jsonify
 
 from config import db
 from src.util import hello_world
@@ -107,6 +107,9 @@ def init_match():
         )
         db.session.add(m)
         db.session.commit()
-        return f"Match {m.match_id} successfully created!"
+        return jsonify(
+            match_id=m.match_id,
+            match_creation_time=m.match_created
+        )
     except:
         abort(500)
