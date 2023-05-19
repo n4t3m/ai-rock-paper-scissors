@@ -2,6 +2,7 @@
 from math import pow
 
 from werkzeug.security import generate_password_hash, check_password_hash
+from src.models import User, MatchHistory
 
 def hello_world():
     '''Simple Hello World Function'''
@@ -25,3 +26,20 @@ def calculate_elo_change(Ra, Rb, winner):
         Rb = Rb + 30 * (1 - Pb)
  
     return (int(Ra),int(Rb))
+
+def getUserRecordFromUsername(username):
+    res = User.query.filter_by(username=username).first()
+    if not res:
+        return None
+    return res
+
+def getRecentMatchFromUsername(username):
+    res = User.query.filter_by(username=username).first()
+    if not res:
+        return None
+    most_recent_match = MatchHistory.query.filter(
+        (MatchHistory.player_one_id == res.id) |
+        (MatchHistory.player_two_id == res.id)
+    ).order_by(MatchHistory.match_created.desc()).first()
+
+    return most_recent_match

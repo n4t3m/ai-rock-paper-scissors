@@ -3,7 +3,7 @@
 from flask import Blueprint, session, abort, request, jsonify
 
 from config import db
-from src.util import calculate_elo_change
+from src.util import hello_world, calculate_elo_change, getRecentMatchFromUsername
 from src.decorators import login_required
 from src.models import User, MatchHistory
 
@@ -109,20 +109,20 @@ def init_match():
     
     # TODO: Check to see if user reporting result was in match
 
-    try:
+    #try:
         # Create User in Database
-        m = MatchHistory(
-            player_one_id=playerOneID,
-            player_two_id=playerTwoID,
+    m = MatchHistory(
+        player_one_id=playerOneID,
+        player_two_id=playerTwoID,
+    )
+    db.session.add(m)
+    db.session.commit()
+    return jsonify(
+        match_id=m.match_id,
+        match_creation_time=m.match_created
         )
-        db.session.add(m)
-        db.session.commit()
-        return jsonify(
-            match_id=m.match_id,
-            match_creation_time=m.match_created
-        )
-    except:
-        abort(500)
+    ##except:
+        #abort(500)
 
 @rps_routes.route("/report_result", methods=["POST"])
 def report_result_match():
@@ -174,3 +174,48 @@ def report_result_match():
         )
     except:
         abort(500)
+
+@rps_routes.route("/match/me", methods=["GET"])
+@login_required
+def my_last_match():
+    '''Get Last Match Route'''
+    res = getRecentMatchFromUsername(session['username'])
+    if not res:
+        return jsonify({'error': 'No Matches Played'}), 404
+    ongoing = "True" if res.winner == "0" else "False"
+    return jsonify({
+        "ongoing": ongoing,
+        'match_id': res.match_id,
+        'player_one_id': res.player_one_id,
+        'player_two_id': res.player_two_id,
+        'player_one_initial_elo': res.player_one_initial_elo,
+        'player_two_initial_elo': res.player_two_initial_elo,
+        'player_one_final_elo': res.player_one_final_elo,
+        'player_two_final_elo': res.player_two_final_elo,
+        'winner': res.winner,
+        'player_one_ack': res.player_one_ack,
+        'player_two_ack': res.player_two_ack,
+        'match_created': res.match_created.strftime('%Y-%m-%d %H:%M:%S')
+    })
+
+@rps_routes.route("/match/<match_id>", methods=["GET"])
+def fetch_match(match_id):
+    '''Fetch Match Route'''
+    res = MatchHistory.query.get(match_id)
+    if not res:
+        return jsonify({'error': 'Matches Not Found'}), 404
+    ongoing = "True" if res.winner == "0" else "False"
+    return jsonify({
+        "ongoing": ongoing,
+        'match_id': res.match_id,
+        'player_one_id': res.player_one_id,
+        'player_two_id': res.player_two_id,
+        'player_one_initial_elo': res.player_one_initial_elo,
+        'player_two_initial_elo': res.player_two_initial_elo,
+        'player_one_final_elo': res.player_one_final_elo,
+        'player_two_final_elo': res.player_two_final_elo,
+        'winner': res.winner,
+        'player_one_ack': res.player_one_ack,
+        'player_two_ack': res.player_two_ack,
+        'match_created': res.match_created.strftime('%Y-%m-%d %H:%M:%S')
+    })
