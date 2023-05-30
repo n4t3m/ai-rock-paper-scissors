@@ -8,6 +8,12 @@ def hello_world():
     '''Simple Hello World Function'''
     return "Hello World!"
 
+# Will assume valid choice is passed into this
+class player_choice:
+    def __init__(self, username, choice):
+        self.username = username
+        self.choice = choice
+
 # Function to calculate the Probability
 # https://www.geeksforgeeks.org/elo-rating-algorithm/#
 def Probability(rating1, rating2):
