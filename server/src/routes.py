@@ -253,6 +253,4 @@ def enqueue_choice():
         abort(400)
 
     g.matchmaking_queue.put(player_choice(session['username'], c))
-    print("New thing added to queue")
-    print(g.matchmaking_queue.qsize())
     return 'Success!', 200
