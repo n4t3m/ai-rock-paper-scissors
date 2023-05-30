@@ -1,7 +1,9 @@
 """rps flask app main file"""
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from src.routes import rps_routes
+from src.util import playMatches
 from src.models import User
 from config import FlaskConfig, db
 
@@ -15,6 +17,11 @@ def create_app():
 
     # Register API Routes
     app.register_blueprint(rps_routes)
+
+    # Init Match Scheduler
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(playMatches, 'interval', seconds=30)
+    scheduler.start()
 
     # Initialize DB
     db.init_app(app)

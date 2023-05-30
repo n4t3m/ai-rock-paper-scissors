@@ -49,3 +49,6 @@ def getRecentMatchFromUsername(username):
     ).order_by(MatchHistory.match_created.desc()).first()
 
     return most_recent_match
+
+def playMatches():
+    print("Running every 30 seconds")
