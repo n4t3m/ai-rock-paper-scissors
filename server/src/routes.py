@@ -212,7 +212,7 @@ def fetch_match(match_id):
     res = MatchHistory.query.get(match_id)
     if not res:
         return jsonify({'error': 'Matches Not Found'}), 404
-    ongoing = "True" if res.winner == "0" else "False"
+    ongoing = "True" if res.winner == "-1" else "False"
     return jsonify({
         "ongoing": ongoing,
         'match_id': res.match_id,
