@@ -1,13 +1,19 @@
 '''This module contains API calls for the RPS Game'''
 
-from flask import Blueprint, session, abort, request, jsonify
+from flask import Blueprint, session, abort, request, jsonify, g, current_app
+from queue import Queue
 
 from config import db
-from src.util import hello_world, calculate_elo_change, getRecentMatchFromUsername
+from src.util import hello_world, calculate_elo_change, getRecentMatchFromUsername,getUserRecordFromUsername, player_choice
 from src.decorators import login_required
 from src.models import User, MatchHistory
 
 rps_routes = Blueprint("rps_routes", __name__)
+
+@rps_routes.before_request
+def before_request():
+    '''Middleware, setup global matchmaking queue'''
+    g.matchmaking_queue = current_app.config['QUEUE']
 
 @rps_routes.route("/", methods=["GET"])
 def hello_world_route():
@@ -125,6 +131,7 @@ def init_match():
         #abort(500)
 
 @rps_routes.route("/report_result", methods=["POST"])
+@login_required
 def report_result_match():
     '''Match Status Route'''
 
@@ -199,12 +206,13 @@ def my_last_match():
     })
 
 @rps_routes.route("/match/<match_id>", methods=["GET"])
+@login_required
 def fetch_match(match_id):
     '''Fetch Match Route'''
     res = MatchHistory.query.get(match_id)
     if not res:
         return jsonify({'error': 'Matches Not Found'}), 404
-    ongoing = "True" if res.winner == "0" else "False"
+    ongoing = "True" if res.winner == "-1" else "False"
     return jsonify({
         "ongoing": ongoing,
         'match_id': res.match_id,
@@ -219,3 +227,30 @@ def fetch_match(match_id):
         'player_two_ack': res.player_two_ack,
         'match_created': res.match_created.strftime('%Y-%m-%d %H:%M:%S')
     })
+
+@rps_routes.route("/report", methods=["POST"])
+@login_required
+def enqueue_choice():
+    '''Enqueues Result for Async Implementation'''
+    # they must be logged in so they must have a username
+    # ensure they have user record
+    res = getUserRecordFromUsername(session['username'])
+    if not res:
+        abort(400)
+
+    # check to see if they are already in queue
+    users_in_queue = [x.username for x in list(g.matchmaking_queue.queue)]
+    if session['username'] in users_in_queue:
+        abort(429) #429 is for rate limiting which is not exactly what is happening but lets just say its whats happening
+
+    # Ensure Choice is present
+    c = request.form.get("choice")
+    if not c:
+        abort(400)
+
+    c = c.lower()
+    if c not in ["rock", "paper", "scissors"]:
+        abort(400)
+
+    g.matchmaking_queue.put(player_choice(session['username'], c))
+    return 'Success!', 200

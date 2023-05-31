@@ -2,6 +2,7 @@
 
 from os import urandom
 from flask_sqlalchemy import SQLAlchemy
+from queue import Queue
 
 db = SQLAlchemy()
 
@@ -12,3 +13,6 @@ class FlaskConfig:
 
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+
+    QUEUE = Queue()
