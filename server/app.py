@@ -2,6 +2,7 @@
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, current_app
+from os import urandom
 from src.routes import rps_routes
 from src.models import User, MatchHistory
 from src.util import determine_rps_winner, playMatches
@@ -30,20 +31,31 @@ def create_app():
         db.drop_all()
         db.create_all()
 
+        secret = urandom(16).hex()
+
         db.session.add(User(
             username="admin",
-            password="password",
+            password=secret,
         ))
+
+        print(f"Randomly generated admin password: {secret}")
+        secret = urandom(16).hex()
 
         db.session.add(User(
             username="nano_one",
-            password="password123",
+            password=secret,
         ))
+
+        print(f"Randomly generated nano_one password: {secret}")
+        secret = urandom(16).hex()
 
         db.session.add(User(
             username="nano_two",
-            password="password123",
+            password=secret,
         ))
+
+        print(f"Randomly generated nano_two password: {secret}")
+        secret = None
 
         # Create Sample Data Here
         db.session.commit()
