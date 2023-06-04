@@ -13,3 +13,10 @@ This server will exist someway somehow on gcp
 
 - If developing, run server with `python -m flask run`
 - If deploying, run server in tmux session `tmux` with `python -m flask run --host 0.0.0.0`
+
+## Docker Deployment Instructions
+
+1.  Switch to server directory
+2.  Build image: `docker build -t rps-server .`
+3.  Run container: `docker run -d -p 5000:5000 rps-server`
+4.  Use container id to retrieve account credentials `docker logs <container id>`
