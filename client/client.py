@@ -78,7 +78,6 @@ class MainPage() :
             self.bad_pass.place(x = 55, y = 330)
     
     def register_user(self):
-        global username 
         username = self.the_user.get()
         password = self.the_user.get()
 
@@ -237,6 +236,7 @@ class Game :
 
 
 # --- MAIN WINDOW ---
+global username 
 session = requests.session()
 MainPage()
-cv2.destroyAllWindows()
+# cv2.destroyAllWindows()
