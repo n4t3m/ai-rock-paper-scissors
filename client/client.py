@@ -239,4 +239,4 @@ class Game :
 global username 
 session = requests.session()
 MainPage()
-# cv2.destroyAllWindows()
+cv2.destroyAllWindows()
