@@ -97,7 +97,7 @@ class LoadingPage() :
         self.bg_panel.image = photo
         self.bg_panel.pack(fill = 'both', expand = 'yes')
 
-        self.Label0L = Label(self.load, text = "Waiting for other players...", font = ("yu gothic ui", 50, 'bold'), bg = '#fffded', fg = 'black')
+        self.Label0L = Label(self.load, text = "Waiting for other players...", font = ("yu gothic ui", 50, 'bold'), bg = '#ebe4d3', fg = 'black')
         self.Label0L.place(x = 120, y = 70)
 
         loading_timer = threading.Timer(3, self.fun)
@@ -106,7 +106,6 @@ class LoadingPage() :
         self.load.mainloop()
 
     def fun(self) :
-        print("In")
         self.Label0L.destroy()
         Game(self.load)
 
@@ -114,8 +113,8 @@ class Game :
     def __init__(self, master):
 
         self.master = master
-        self.master.geometry("1000x800")
-        self.master.title("Changed")
+        self.master.geometry("800x700")
+        self.master.title("Lets Play!")
         self.master.resizable(0,0)
 
         # ----- Background Image ----
@@ -126,20 +125,33 @@ class Game :
         self.bg_panel.pack(fill = 'both', expand = 'yes')
 
         # ------ Labels and Buttons ------
-        self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 50, 'bold'), bg = '#fff9ff', fg = 'black')
-        self.GLabel.place(x = 300, y = 70)
 
-        frame = Frame(self.master, bg = '#fffded', width = '350', height=500)
-        frame.place(x = 40, y = 60)
-        frame.pack()
+        frame = Frame(self.master, bg = '#ebe4d3', width = '460', height=180)
+        frame.place(x = 190, y = 60)
 
-        player1_score_label = Label(frame, text="Player 1: 0", font=10)
-        vs_label = Label(frame, text="VS", font="normal 10 bold")
-        player2_score_label = Label(frame, text="Player 2: 0", font=10)
+        self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 50, 'bold'), bg = '#ebe4d3', fg = 'black')
+        self.GLabel.place(x = 200, y = 60) #300
 
-        player1_score_label.place(x = 120, y = 40)
-        vs_label.place(x = 120, y = 70)
-        player2_score_label.place(x = 120, y = 20)
+        player1_score_label = Label(self.master, text="Player 1: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
+        player1_score_label.place(x = 300, y = 150)
+
+        # vs_label = Label(self.master, text="VS", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg ='black')
+        # vs_label.place(x = 380, y = 200)
+
+        player2_score_label = Label(self.master, text="Player 2: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3',  fg = 'black')
+        player2_score_label.place(x = 420, y = 150)
+
+        # result_label = Label(self.master, text="", font="normal 20 bold", bg="white", width=15, borderwidth=2, relief="solid")
+        # result_label.pack(pady=20)
+
+        
+        b1 = Button(self.master, text="Rock", font= ("yu gothic ui", 5))
+        b2 = Button(self.master, text="Paper", font=("yu gothic ui", 5))
+        b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 5))
+
+        b1.place(x = 290, y = 200)
+        b2.place(x = 370, y = 200)
+        b3.place(x = 455, y = 200)
 
         #Score variables
         self.player1_score = 0
@@ -209,34 +221,17 @@ class Game :
 
 
         # Add Labels, Frames, and Buttons
-        
 
-
-
-        # result_label = Label(self.master, text="", font="normal 20 bold", bg="white", width=15, borderwidth=2, relief="solid")
-        # result_label.pack(pady=20)
-
-        # frame1 = Frame(self.master)
-        # frame1.pack()
-
-        
-        # # b1 = Button(frame1, text="Rock", font='sans 16', width=7)
-        # # b2 = Button(frame1, text="Paper", font='sans 16', width=7)
-        # # b3 = Button(frame1, text="Scissor", font='sans 16', width=7)
-
-        # # b1..place(x = 120, y = 70)
-        # b2.place(x = 120, y = 70)
-        # b3.pack(padx=10)
 
         video_label = Label(self.master, width=400, height=400)
-        video_label.pack()
+        video_label.place(x = 220, y = 250)
 
         # Start capturing video frames
         capture_video()
 
 
 # --- MAIN WINDOW ---
-LoadingPage()
+MainPage()
 cv2.destroyAllWindows()
 
 # Create login frame
