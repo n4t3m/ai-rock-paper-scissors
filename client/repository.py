@@ -9,6 +9,13 @@ def login(session, username: str, password: str) -> int:
     })
     return r.status_code
 
+def register(session, username: str, password: str) -> int:
+    r = session.post(__endpoint_url__ + "/register", {
+        "username": username,
+        "password": password
+    })
+    return r.status_code, r.text
+
 def make_choice(session, choice: str):
     if choice not in ["rock", "paper", "scissors"]:
         return None

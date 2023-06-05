@@ -13,7 +13,16 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 def register_user():
-    print("Do Something")
+    username = username_entry.get()
+    password = password_entry.get()
+
+    res = repository.register(session, username, password)
+
+    # Check if username and password are correct
+    if res[0] == 200:
+        messagebox.showinfo("Success", res[1])
+    else:
+        messagebox.showerror("Error", res[1])
 
 # Function to validate login credentials
 def validate_login():
