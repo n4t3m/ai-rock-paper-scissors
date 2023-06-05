@@ -21,7 +21,7 @@ def create_app():
 
     # Init Match Scheduler
     scheduler = BackgroundScheduler()
-    scheduler.add_job(playMatches, 'interval', seconds=10, args=(app,))
+    scheduler.add_job(playMatches, 'interval', seconds=5, args=(app,))
     scheduler.start()
 
     # Initialize DB
