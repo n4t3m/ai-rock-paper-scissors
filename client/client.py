@@ -38,40 +38,40 @@ class MainPage() :
         self.the_pass = StringVar()
 
         self.label0 = Label(self.login_frame, text = "Login", font = ("yu gothic ui", 40, 'bold'), bg = '#fffded', fg = 'black')
-        self.label0.place(x = 125, y = 40)
+        self.label0.place(x = 100, y = 40)
 
-        self.label1 = Label(self.login_frame, text = "Username", font = ("yu gothic ui", 18), bg = '#fffded', fg = 'black')
+        self.label1 = Label(self.login_frame, text = "Username", font = ("yu gothic ui", 16), bg = '#fffded', fg = 'black')
         self.label1.place(x = 56, y = 120)
 
-        self.entry1 = Entry(self.login_frame, textvariable = self.the_user, font = ("yu gothic ui", 18), bg = '#ebedec', fg = 'black')
+        self.entry1 = Entry(self.login_frame, textvariable = self.the_user, font = ("yu gothic ui", 14), bg = '#ebedec', fg = 'black')
         self.entry1.place(x = 56, y = 150)
 
-        self.label2 = Label(self.login_frame, text = "Password", font = ("yu gothic ui", 18), bg = '#fffded', fg = 'black')
+        self.label2 = Label(self.login_frame, text = "Password", font = ("yu gothic ui", 16), bg = '#fffded', fg = 'black')
         self.label2.place(x = 56, y = 200)
 
-        self.entry2 = Entry(self.login_frame, show='*', textvariable = self.the_pass, font = ("yu gothic ui", 18), bg = '#ebedec', fg = 'black')
+        self.entry2 = Entry(self.login_frame, show='*', textvariable = self.the_pass, font = ("yu gothic ui", 14), bg = '#ebedec', fg = 'black')
         self.entry2.place(x = 56, y = 230)
 
         self.label3 = Button(self.login_frame, text="Login", command = self.validate_login, font = ("yu gothic ui", 18), bg = '#fffded', fg = 'black')
         self.label3.place(x = 140, y = 290)
 
-        self.bad_pass = Label(self.login_frame  , text="Incorrect Username or Password", font = ("yu gothic ui", 16), bg = '#fffded', fg = 'black')
+        self.bad_pass = Label(self.login_frame  , text="Incorrect Username or Password", font = ("yu gothic ui", 12), bg = '#fffded', fg = 'black')
 
         # --- Register ---
 
         self.label6 = Label(self.login_frame, text = "Register Here", font = ("yu gothic ui", 15), bg = '#fffded', fg = 'black')
-        self.label6.place(x = 135, y = 380)
+        self.label6.place(x = 120, y = 380)
 
         self.label7 = Button(self.login_frame, text= "Register", font = ("yu gothic ui", 15))
-        self.label7.place(x = 135, y = 410)
+        self.label7.place(x = 130, y = 410)
 
         self.main.mainloop()
 
     # Function to validate login credentials
     def validate_login(self):
-        repository.login(session, self.the_user, self.the_pass)
+        res = repository.login(session, self.the_user, self.the_pass)
         # Check if username and password are correct
-        if self.the_user.get() == "a" and self.the_pass.get() == "p":
+        if res == 200":
             self.main.destroy()
             LoadingPage()
         else:
@@ -104,8 +104,8 @@ class LoadingPage() :
         self.bg_panel.image = photo
         self.bg_panel.pack(fill = 'both', expand = 'yes')
 
-        self.Label0L = Label(self.load, text = "Waiting for other players...", font = ("yu gothic ui", 50, 'bold'), bg = '#ebe4d3', fg = 'black')
-        self.Label0L.place(x = 120, y = 70)
+        self.Label0L = Label(self.load, text = "Waiting for other players...", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
+        self.Label0L.place(x = 70, y = 70)
 
         loading_timer = threading.Timer(3, self.fun)
         loading_timer.start()
@@ -133,14 +133,14 @@ class Game :
 
         # ------ Labels and Buttons ------
 
-        frame = Frame(self.master, bg = '#ebe4d3', width = '460', height=180)
-        frame.place(x = 190, y = 60)
+        frame = Frame(self.master, bg = '#ebe4d3', width = '580', height=180)
+        frame.place(x = 125, y = 60)
 
-        self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 50, 'bold'), bg = '#ebe4d3', fg = 'black')
-        self.GLabel.place(x = 200, y = 60) #300
+        self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
+        self.GLabel.place(x = 125, y = 60) #300
 
         player1_score_label = Label(self.master, text="Player 1: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
-        player1_score_label.place(x = 300, y = 150)
+        player1_score_label.place(x = 200, y = 150)
 
         vs_label = Label(self.master, text="VS", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg ='black')
         vs_label.place(x = 380, y = 200)
@@ -152,9 +152,9 @@ class Game :
         result_label.pack(pady=20)
 
         
-        b1 = Button(self.master, text="Rock", font= ("yu gothic ui", 5))
-        b2 = Button(self.master, text="Paper", font=("yu gothic ui", 5))
-        b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 5))
+        b1 = Button(self.master, text="Rock", font= ("yu gothic ui", 15))
+        b2 = Button(self.master, text="Paper", font=("yu gothic ui", 15))
+        b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 15))
 
         b1.place(x = 290, y = 200)
         b2.place(x = 370, y = 200)
@@ -164,7 +164,7 @@ class Game :
         self.player1_score = 0
         self.player2_score = 0
 
-        video = cv2.VideoCapture(0)
+        video = cv2.VideoCapture(-1)
 
         if not video.isOpened():
             raise IOError("Camera not enabled")
@@ -184,6 +184,8 @@ class Game :
             scheduler.start()
             
             def update_frame():
+                cap = cv2.VideoCapture(0)
+
                 ret, frame = cap.read()
                 if ret:
                     frame = cv2.flip(frame, 1)  # Flip frame horizontally
@@ -213,7 +215,7 @@ class Game :
                             b2.configure(font='sans 16 bold', fg='red')
                         else:
                             b3.configure(font='sans 16 bold', fg='red')
-                        make_choice_job.modify(args=(username, labels[inferred_result]))
+                        #make_choice_job.modify(args=(username, labels[inferred_result]))
                         print(f"Inferred result: {labels[inferred_result]} with confidence {confidence*100}%")
 
                 video_label.after(10, update_frame)
@@ -233,6 +235,7 @@ class Game :
 
         # Start capturing video frames
         capture_video()
+        self.master.mainloop()
 
 
 # --- MAIN WINDOW ---
