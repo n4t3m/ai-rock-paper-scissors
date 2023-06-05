@@ -4,7 +4,7 @@ from flask import Blueprint, session, abort, request, jsonify, g, current_app
 from queue import Queue
 
 from config import db
-from src.util import hello_world, calculate_elo_change, getRecentMatchFromUsername,getUserRecordFromUsername, player_choice
+from src.util import hello_world, calculate_elo_change, getRecentMatchFromUsername,getUserRecordFromUsername, player_choice, getRecentMatchData
 from src.decorators import login_required
 from src.models import User, MatchHistory
 
@@ -204,6 +204,15 @@ def my_last_match():
         'player_two_ack': res.player_two_ack,
         'match_created': res.match_created.strftime('%Y-%m-%d %H:%M:%S')
     })
+
+@rps_routes.route("/match/stats", methods=["GET"])
+@login_required
+def my_match_stats():
+    '''Get Match Stats'''
+    res = getRecentMatchFromUsername(session['username'])
+    if not res:
+        return jsonify({'error': 'No Matches Played'}), 404
+    return jsonify(getRecentMatchData(session['username']))
 
 @rps_routes.route("/match/<match_id>", methods=["GET"])
 @login_required

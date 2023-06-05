@@ -54,6 +54,49 @@ def getRecentMatchFromUsername(username):
 
     return most_recent_match
 
+def getRecentMatchData(username) -> dict:
+    res = User.query.filter_by(username=username).first()
+    if not res:
+        return None
+    
+    target_id = res.id
+
+    most_recent_matches = MatchHistory.query.filter(
+        (MatchHistory.player_one_id == res.id) |
+        (MatchHistory.player_two_id == res.id)
+    ).order_by(MatchHistory.match_created.desc())
+
+    ret = {}
+    ret["wins"] = 0;
+    ret["losses"] = 0;
+    ret["ties"] = 0;
+    ret["matches"] = []
+
+    for match in most_recent_matches:
+        # if user is player_one
+        match_object = {}
+        if match.player_one_id == target_id:
+            match_object["final_elo"] = match.player_one_final_elo
+            match_object["opponent_name"] = User.query.filter_by(id=match.player_two_id).first().username
+            if match.winner == "1":
+                ret["wins"]+=1
+                match_object["result"] = "Win"
+            else:
+                ret["losses"]+=1
+                match_object["result"] = "Loss"
+        else:
+            # user is player 2
+            match_object["final_elo"] = match.player_two_final_elo
+            match_object["opponent_name"] = User.query.filter_by(id=match.player_one_id).first().username
+        if match.winner == "3":
+            ret["ties"]+=1
+            match_object["result"] = "Tie"
+
+        match_object["timestamp"] = match.match_created
+        ret["matches"].append(match_object)
+
+    return ret
+
 def record_tie(p1username, p2username):
     '''no winner, no elo calculation'''
     p1 = User.query.filter_by(username=p1username).first()
