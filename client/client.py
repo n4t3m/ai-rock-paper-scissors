@@ -71,7 +71,7 @@ class MainPage() :
     def validate_login(self):
         res = repository.login(session, self.the_user, self.the_pass)
         # Check if username and password are correct
-        if res == 200":
+        if res == 200:
             self.main.destroy()
             LoadingPage()
         else:
