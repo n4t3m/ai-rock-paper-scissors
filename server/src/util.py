@@ -95,6 +95,10 @@ def getRecentMatchData(username) -> dict:
         match_object["timestamp"] = match.match_created
         ret["matches"].append(match_object)
 
+    # TODO: do the following line of code in a more clean way
+    # Prevent too much data from being sent
+    if len(ret["matches"])>10:
+        ret["matches"] = ret["matches"][:10]
     return ret
 
 def record_tie(p1username, p2username):
