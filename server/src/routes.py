@@ -71,6 +71,9 @@ def login():
         # print("Password not Provided!")
         abort(400)
 
+    #if "username" in session:
+        #abort(400, "You are already logged in!")
+
     user_record = User.query.filter_by(username=username).first()
 
     if user_record and user_record.verify_password(password):
