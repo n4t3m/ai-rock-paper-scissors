@@ -92,6 +92,7 @@ def getRecentMatchData(username) -> dict:
             ret["ties"]+=1
             match_object["result"] = "Tie"
 
+        match_object["id"] = match.match_id
         match_object["timestamp"] = match.match_created
         ret["matches"].append(match_object)
 
