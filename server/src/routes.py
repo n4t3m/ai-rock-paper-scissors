@@ -26,11 +26,20 @@ def register():
     username = request.form.get("username")
     if not username:
         # print("Username Not Provided!")
-        abort(400)
+        abort(400, "Username not Provided")
     password = request.form.get("password")
     if not password:
         # print("Password not Provided!")
-        abort(400)
+        abort(400, "Password not Provided")
+
+    if len(username) < 4:
+        abort(400, "Requested username is too short.")
+    if len(username) > 32:
+        abort(400, "Requested username is too long.")
+    if len(password) < 6:
+        abort(400, "Requested password is too short")
+    if len(password) > 256:
+        abort(400, "Requested password is too long")
 
     try:
         # Create User in Database
@@ -42,7 +51,7 @@ def register():
         return f"User {username} successfully created!"
     except:
         # this handles all potential errors, including duplicate usernames
-        abort(500) # todo, figure out better way to handle this
+        abort(500, "An error has occured.") # todo, figure out better way to handle this
 
 # @rps_routes.route("/login", methods=["GET"])
 # def login():
@@ -61,6 +70,9 @@ def login():
     if not password:
         # print("Password not Provided!")
         abort(400)
+
+    #if "username" in session:
+        #abort(400, "You are already logged in!")
 
     user_record = User.query.filter_by(username=username).first()
 
