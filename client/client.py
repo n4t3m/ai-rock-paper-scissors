@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 import time
 import threading
 import repository
+import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
@@ -16,18 +17,17 @@ def register_user():
 
 # Function to validate login credentials
 def validate_login():
-    global username, password
     username = username_entry.get()
     password = password_entry.get()
 
-    repository.login(username, password)
+    res = repository.login(session, username, password)
 
     # Check if username and password are correct
-    if username == "a" and password == "p":
+    if res == 200:
         login_frame.pack_forget()  # Hide the login frame
         show_loading_screen()
     else:
-        messagebox.showerror("Login Error", "Invalid username or password")
+        messagebox.showerror("Error", "Invalid username or password")
 
 def show_loading_screen():
     Label(loading_frame, text="WAITING FOR OTHER PLAYERS...", font="normal 20 bold").pack(pady=50)
@@ -60,10 +60,8 @@ def show_game_interface():
     def capture_video():
         cap = cv2.VideoCapture(0)
 
-        repository.login(username, password)
-
         scheduler = BackgroundScheduler()
-        make_choice_job = scheduler.add_job(repository.make_choice, args=(username, ""), trigger="interval", seconds=10)
+        make_choice_job = scheduler.add_job(repository.make_choice, args=(session, ""), trigger="interval", seconds=10)
         scheduler.start()
         
         def update_frame():
@@ -96,7 +94,7 @@ def show_game_interface():
                         b2.configure(font='sans 16 bold', fg='red')
                     else:
                         b3.configure(font='sans 16 bold', fg='red')
-                    make_choice_job.modify(args=(username, labels[inferred_result]))
+                    make_choice_job.modify(args=(session, labels[inferred_result]))
                     print(f"Inferred result: {labels[inferred_result]} with confidence {confidence*100}%")
 
             video_label.after(10, update_frame)
@@ -149,6 +147,8 @@ def show_game_interface():
 root = Tk()
 root.geometry("800x600")
 root.title("Rock Paper Scissor Game")
+
+session = requests.session()
 
 # Create login frame
 login_frame = Frame(root)
