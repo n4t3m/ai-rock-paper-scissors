@@ -8,13 +8,9 @@ from PIL import Image, ImageTk
 import time
 import threading
 import repository
+import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 
-
-# --- LOGIN / REGISTERATION ---
-
-def register_user():
-    print("Do Something")
 
 
 # --- GAME ---
@@ -81,6 +77,18 @@ class MainPage() :
             LoadingPage()
         else:
             self.bad_pass.place(x = 55, y = 330)
+    
+    def register_user(self):
+        username = self.the_user.get()
+        password = self.the_user.get()
+
+        res = repository.login(session, username, password)
+
+        if res[0] == 200:
+            messagebox.showinfo("Success", res[1])
+        
+        else :
+            messagebox.showerror("Error", res[1])
 
 
 class LoadingPage() :
@@ -172,11 +180,9 @@ class Game :
         def capture_video():
             cap = cv2.VideoCapture(0)
 
-            # repository.login(username, password)
-
-            # scheduler = BackgroundScheduler()
-            # make_choice_job = scheduler.add_job(repository.make_choice, args=(username, ""), trigger="interval", seconds=10)
-            # scheduler.start()
+            scheduler = BackgroundScheduler()
+            make_choice_job = scheduler.add_job(repository.make_choice, args=(session, ""), trigger="interval", seconds=10)
+            scheduler.start()
             
             def update_frame():
                 ret, frame = cap.read()
@@ -231,6 +237,7 @@ class Game :
 
 
 # --- MAIN WINDOW ---
+session = requests.session()
 MainPage()
 cv2.destroyAllWindows()
 
