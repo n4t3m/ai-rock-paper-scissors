@@ -68,7 +68,7 @@ def login():
         session['username']=username
         return "You have been logged in!"
 
-    return "Username/Password Combination Not Found"
+    return abort(400, "Username/Password Combination Not Found")
 
 @rps_routes.route("/logout", methods=["GET"])
 def logout():
