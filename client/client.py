@@ -118,7 +118,6 @@ class LoadingPage() :
 
 class Game :
     def __init__(self, master):
-
         self.master = master
         self.master.geometry("800x700")
         self.master.title("Lets Play!")
@@ -132,6 +131,8 @@ class Game :
         self.bg_panel.pack(fill = 'both', expand = 'yes')
 
         # ------ Labels and Buttons ------
+        def stat() :
+            print("Do")
 
         frame = Frame(self.master, bg = '#ebe4d3', width = '580', height=180)
         frame.place(x = 125, y = 60)
@@ -156,7 +157,7 @@ class Game :
         b2 = Button(self.master, text="Paper", font=("yu gothic ui", 15))
         b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 15))
 
-        b4 = Button(self.master, text="Stat", command = stat, font=("yu gothic ui", 15))
+        b4 = Button(self.master, text="Get Stats", command = stat, font=("yu gothic ui", 15))
         b4.place(x = 325, y = 200)
 
         b1.place(x = 290, y = 200)
@@ -167,11 +168,6 @@ class Game :
         self.player1_score = 0
         self.player2_score = 0
 
-        video = cv2.VideoCapture(-1)
-
-        if not video.isOpened():
-            raise IOError("Camera not enabled")
-
         # Load the model. This should be located within the same directory and labeled the same as it was in the original notebook.
         model = tf.keras.models.load_model("./rock_paper_scissors_mobilenet_v2.h5")
         labels = ['rock', 'paper', 'scissors']
@@ -180,8 +176,6 @@ class Game :
         height = 128
 
         def capture_video():
-            cap = cv2.VideoCapture(0)
-
             scheduler = BackgroundScheduler()
             make_choice_job = scheduler.add_job(repository.make_choice, args=(session, ""), trigger="interval", seconds=10)
             scheduler.start()
@@ -229,9 +223,6 @@ class Game :
         # Update score function
         def update_score(player):
             print("Update")
-        
-        def stat() :
-            print("Do")
 
 
         # Add Labels, Frames, and Buttons
