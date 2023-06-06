@@ -47,7 +47,7 @@ def create_app():
         ))
 
         print(f"Randomly generated nano_one password: {secret}")
-        secret = urandom(1).hex()
+        secret = urandom(16).hex()
 
         db.session.add(User(
             username="nano_two",
