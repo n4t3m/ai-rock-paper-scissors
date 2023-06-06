@@ -2,9 +2,6 @@
 from datetime import datetime
 from math import pow
 
-from flask import g, current_app
-from werkzeug.security import generate_password_hash, check_password_hash
-
 from config import db
 from src.models import User, MatchHistory
 
@@ -14,6 +11,7 @@ def hello_world():
 
 # Will assume valid choice is passed into this
 class player_choice:
+    '''Player Choice Class for Matchmaking Queue'''
     def __init__(self, username, choice):
         self.username = username
         self.choice = choice
@@ -26,24 +24,26 @@ def Probability(rating1, rating2):
 def calculate_elo_change(Ra, Rb, winner):
     Pb = Probability(Ra, Rb)
     Pa = Probability(Rb, Ra)
-    
-    if (str(winner) == "1"):
+
+    if str(winner) == "1":
         Ra = Ra + 30 * (1 - Pa)
         Rb = Rb + 30 * (0 - Pb)
- 
+
     else:
         Ra = Ra + 30 * (0 - Pa)
         Rb = Rb + 30 * (1 - Pb)
- 
+
     return (int(Ra),int(Rb))
 
 def getUserRecordFromUsername(username):
+    '''Gets user record associated with username'''
     res = User.query.filter_by(username=username).first()
     if not res:
         return None
     return res
 
 def getRecentMatchFromUsername(username):
+    '''Gets most recent MatchHistory Object From Username'''
     res = User.query.filter_by(username=username).first()
     if not res:
         return None
@@ -67,9 +67,9 @@ def getRecentMatchData(username) -> dict:
     ).order_by(MatchHistory.match_created.desc())
 
     ret = {}
-    ret["wins"] = 0;
-    ret["losses"] = 0;
-    ret["ties"] = 0;
+    ret["wins"] = 0
+    ret["losses"] = 0
+    ret["ties"] = 0
     ret["matches"] = []
 
     for match in most_recent_matches:
@@ -179,7 +179,6 @@ def playMatches(app):
             if res == 3:
                 # Tie, Record Match
                 record_tie(p1.username, p2.username)
-                pass
             elif res==1:
                 # P1 Wins
                 record_win(p1.username, p2.username, "1")

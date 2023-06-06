@@ -1,11 +1,12 @@
 """rps flask app main file"""
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, current_app
 from os import urandom
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask
 from src.routes import rps_routes
-from src.models import User, MatchHistory
-from src.util import determine_rps_winner, playMatches
+from src.models import User
+from src.util import playMatches
 from config import FlaskConfig, db
 
 def create_app():
