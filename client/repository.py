@@ -26,8 +26,14 @@ def make_choice(session, choice: str):
     return r.status_code
 
 def retrieve_stats(session):
-    r = session.get(__endpoint_url__ + "/queuecheck")
+    r = session.get(__endpoint_url__ + "/match/stats")
     if not r:
         return None
     r = r.json()
     return r
+
+def check_queue(session):
+    r = session.get(__endpoint_url__ + "/queuecheck")
+    if not r:
+        return None
+    return r.status_code == 200
