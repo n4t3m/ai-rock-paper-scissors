@@ -160,7 +160,7 @@ class Game :
         self.b3 = Button(self.master, text="Scissors", font=("yu gothic ui", 15))
 
         self.b4 = Button(self.master, text="Update Stats", command = self.update_score, font=("yu gothic ui", 15))
-        self.b4.place(x = 540, y = 200)
+        self.b4.place(x = 370, y = 660)
 
         self.b1.place(x = 290, y = 200)
         self.b2.place(x = 370, y = 200)
@@ -202,7 +202,6 @@ class Game :
             imgtk = ImageTk.PhotoImage(image=img)
             self.video_label.imgtk = imgtk
             self.video_label.configure(image=imgtk)
-            print("inside2")
             if confidence < 0.5:
                 print("Rejected result - confidence too low.")
             else:
@@ -223,10 +222,11 @@ class Game :
 
 
     # Update score function
-    def update_score(self, player):
+    def update_score(self):
         res = repository.retrieve_stats(session)
-        self.player1_score_label.config(text=f"Wins: {res['wins']}")
-        self.player2_score_label.config(text=f"Losses: {res['losses']}")
+        if res != None:
+            self.player1_score_label.config(text=f"Wins: {res['wins']}")
+            self.player2_score_label.config(text=f"Losses: {res['losses']}")
         # ties key also exists
 
     
