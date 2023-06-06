@@ -185,14 +185,11 @@ class Game :
 
         # Start capturing video frames
         self.cap = cv2.VideoCapture(0)
-        # self.capture_video()
         self.update_frame()
         
     def update_frame(self):
-        #print("here")
         ret, frame = self.cap.read()
         if ret:
-            #print("inside")
             frame = cv2.flip(frame, 1)  # Flip frame horizontally
             frame_tensor = tf.expand_dims(frame, 0)
             image = tf.cast(frame_tensor, tf.float32)
@@ -233,8 +230,9 @@ class Game :
     # Update score function
     def update_score(self):
         res = repository.retrieve_stats(session)
-        self.player1_score_label.config(text=f"Wins: {res['wins']}")
-        self.player2_score_label.config(text=f"Losses: {res['losses']}")
+        if res != None:
+            self.player1_score_label.config(text=f"Wins: {res['wins']}")
+            self.player2_score_label.config(text=f"Losses: {res['losses']}")
         # ties key also exists
 
     
