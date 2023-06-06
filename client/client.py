@@ -170,11 +170,6 @@ class Game :
         self.player1_score = 0
         self.player2_score = 0
 
-        self.video = cv2.VideoCapture(0)
-
-        if not self.video.isOpened():
-            raise IOError("Camera not enabled")
-
         # Load the model. This should be located within the same directory and labeled the same as it was in the original notebook.
         self.model = tf.keras.models.load_model("./rock_paper_scissors_mobilenet_v2.h5")
         self.labels = ['rock', 'paper', 'scissors']
@@ -188,14 +183,11 @@ class Game :
 
         # Start capturing video frames
         self.cap = cv2.VideoCapture(0)
-        # self.capture_video()
         self.update_frame()
         
     def update_frame(self):
-        print("here")
         ret, frame = self.cap.read()
         if ret:
-            print("inside")
             frame = cv2.flip(frame, 1)  # Flip frame horizontally
             frame_tensor = tf.expand_dims(frame, 0)
             image = tf.cast(frame_tensor, tf.float32)
