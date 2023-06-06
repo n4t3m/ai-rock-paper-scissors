@@ -24,3 +24,14 @@ def make_choice(session, choice: str):
         "choice": choice
     })
     return r.status_code
+
+def logout(session):
+    r = session.get(__endpoint_url__ + "/logout")
+
+    return r.status_code, r.text
+
+def get_sats(session):
+    r = session.get(__endpoint_url__ + "/match/stats")
+    return r.json()
+    
+
