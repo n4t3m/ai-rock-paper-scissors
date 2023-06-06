@@ -159,8 +159,8 @@ class Game :
         self.b2 = Button(self.master, text="Paper", font=("yu gothic ui", 15))
         self.b3 = Button(self.master, text="Scissors", font=("yu gothic ui", 15))
 
-        self.b4 = Button(self.master, text="Update Stats", command = self.update_score, font=("yu gothic ui", 15))
-        self.b4.place(x = 370, y = 660)
+        self.b4 = Button(self.master, text="Play!", command = self.select, font=("yu gothic ui", 15))
+        self.b4.place(x = 540, y = 200)
 
         self.b1.place(x = 290, y = 200)
         self.b2.place(x = 370, y = 200)
@@ -169,6 +169,8 @@ class Game :
         #Score variables
         self.player1_score = 0
         self.player2_score = 0
+
+        self.current_choice = ""
 
         # Load the model. This should be located within the same directory and labeled the same as it was in the original notebook.
         self.model = tf.keras.models.load_model("./rock_paper_scissors_mobilenet_v2.h5")
@@ -211,13 +213,17 @@ class Game :
                 
                 if self.labels[inferred_result] == 'rock':
                     self.b1.configure(font='sans 16 bold', fg='red')
+                    self.current_choice = "rock"
+                    print()
                 elif self.labels[inferred_result] == 'paper':
                     self.b2.configure(font='sans 16 bold', fg='red')
+                    self.current_choice = "paper"
                 else:
                     self.b3.configure(font='sans 16 bold', fg='red')
+                    self.current_choice = "scissors"
                 # TODO: Switch to button from scheduler
                 # make_choice_job.modify(args=(username, labels[inferred_result]))
-                print(f"Inferred result: {self.labels[inferred_result]} with confidence {confidence*100}%")
+                # print(f"Inferred result: {self.labels[inferred_result]} with confidence {confidence*100}%")
             self.master.after(10, self.update_frame)
 
 
@@ -230,11 +236,28 @@ class Game :
         # ties key also exists
 
     
-    # def stat(self):
-    #     res = repository.retrieve_stats(session)
-    #     label.config(text="Updated Text")
+    def select(self):
+        print("here")
+        if self.current_choice == "":
+            print("LOOOK HERE", self.current_choice)
+            return
+        res = repository.make_choice(session, self.current_choice)
 
+        loading_screen = Toplevel()
+        loading_screen.title("Loading...")
+        loading_screen.geometry("200x100")
 
+        def check_and_destroy():
+            if repository.check_queue(session):
+                loading_screen.destroy()
+                self.update_score()
+            else:
+                loading_screen.after(100, check_and_destroy)
+    
+        label = Label(loading_screen, text="Loading...")
+        label.pack(pady=30)
+
+        loading_screen.after(100, check_and_destroy)
 
 # --- MAIN WINDOW ---
 global username 
