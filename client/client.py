@@ -33,7 +33,7 @@ class MainPage() :
         self.login_frame.place(x=225,y=80)
 
         # ---- Login ----
-
+        
         self.the_user = StringVar()  # used to retrieve input from entry
         self.the_pass = StringVar()
 
@@ -57,6 +57,7 @@ class MainPage() :
 
         self.bad_pass = Label(self.login_frame  , text="Incorrect Username or Password", font = ("yu gothic ui", 12), bg = '#fffded', fg = 'black')
 
+        
         # --- Register ---
 
         self.label6 = Label(self.login_frame, text = "Register Here", font = ("yu gothic ui", 15), bg = '#fffded', fg = 'black')
@@ -69,6 +70,7 @@ class MainPage() :
 
     # Function to validate login credentials
     def validate_login(self):
+        
         res = repository.login(session, self.the_user, self.the_pass)
         # Check if username and password are correct
         if res == 200:
@@ -104,7 +106,7 @@ class LoadingPage() :
         self.bg_panel.image = photo
         self.bg_panel.pack(fill = 'both', expand = 'yes')
 
-        self.Label0L = Label(self.load, text = "Waiting for other players...", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
+        self.Label0L = Label(self.load, text = "Booting up...", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
         self.Label0L.place(x = 70, y = 70)
 
         loading_timer = threading.Timer(3, self.fun)
@@ -115,10 +117,30 @@ class LoadingPage() :
     def fun(self) :
         self.Label0L.destroy()
         Game(self.load)
+    
+class WaitingPage() :
+    def __init__(self) :
+        self.waiting = Tk()
+        self.waiting.geometry("800x700")
+        self.waiting.title("Rock Paper Scissor Game")
+        self.waiting.resizable(0,0)
+
+        # ----- Background Image ----
+        self.bgframe = Image.open('images/background.png')
+        photo = ImageTk.PhotoImage(self.bgframe)
+        self.bg_panel = Label(self.waiting, image=photo)
+        self.bg_panel.image = photo
+        self.bg_panel.pack(fill = 'both', expand = 'yes')
+
+        self.Label0L = Label(self.waiting, text = "Waiting for other players...", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
+        self.Label0L.place(x = 70, y = 70)
+
+        self.waiting.mainloop()
+
 
 class Game :
     def __init__(self, master):
-
+        self.match_history = repository.get_sats(session)
         self.master = master
         self.master.geometry("800x700")
         self.master.title("Lets Play!")
@@ -132,6 +154,9 @@ class Game :
         self.bg_panel.pack(fill = 'both', expand = 'yes')
 
         # ------ Labels and Buttons ------
+        losses = self.match_history['losses']
+        wins = self.match_history['wins']
+        ties = self.match_history['ties']
 
         frame = Frame(self.master, bg = '#ebe4d3', width = '580', height=180)
         frame.place(x = 125, y = 60)
@@ -139,26 +164,73 @@ class Game :
         self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
         self.GLabel.place(x = 125, y = 60) #300
 
-        player1_score_label = Label(self.master, text="Player 1: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
+        player1_score_label = Label(self.master, text="{}:".format(username), font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
         player1_score_label.place(x = 200, y = 150)
 
-        vs_label = Label(self.master, text="VS", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg ='black')
-        vs_label.place(x = 380, y = 200)
+        vs_label = Label(self.master, text="Wins: {}   Ties: {}   Losses: {}".format(wins, losses, ties), font = ("yu gothic ui", 20), bg = '#ebe4d3', fg ='black')
+        vs_label.place(x = 300, y = 150)
 
-        player2_score_label = Label(self.master, text="Player 2: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3',  fg = 'black')
-        player2_score_label.place(x = 420, y = 150)
+        # player2_score_label = Label(self.master, text="Player 2: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3',  fg = 'black')
+        # player2_score_label.place(x = 420, y = 150)
 
-        result_label = Label(self.master, text="", font="normal 20 bold", bg="white", width=15, borderwidth=2, relief="solid")
-        result_label.pack(pady=20)
+        # result_label = Label(self.master, text="", font="normal 20 bold", bg="white", width=15, borderwidth=2, relief="solid")
+        # result_label.pack(pady=20)
 
+        def select_button():
+            if b1.cget('fg') == 'red':
+                repository.make_choice(session, "rock")
+            elif b2.cget('fg') == 'red':
+                repository.make_choice(session, "paper" )
+            elif b3.cget('fg') == 'red':
+                repository.make_choice(session, "scissors")
+                
+            video.release()
+            cv2.destroyAllWindows()
+            for widget in self.master.winfo_children():
+                widget.destroy()
+            # WaitingPage()
+            get_results()
+
+        def get_results():
+            while True:
+                self.new_match_history = repository.get_sats(session)
+# Change to !=
+                if self.new_match_history != NONE:
+                    if self.new_match_history['matches'][0] and self.match_history['matches'][0] and self.new_match_history['matches'][0]['id'] == self.match_history['matches'][0]['id']:
+                        if self.new_match_history['matches'][0]['result'] == 'Win':
+                            result_label = Label(self.master, text="Win! You won over {}".format(self.new_match_history['matches'][0]['opponent_name']), font="normal 30 bold", bg="white", borderwidth=2, relief="solid")
+                            result_label.pack(pady=20)
+                        elif self.new_match_history['matches'][0]['result'] == 'Tie':
+                            result_label = Label(self.master, text="You tied with {}".format(self.new_match_history['matches'][0]['opponent_name']), font="normal 30 bold", bg="white", borderwidth=2, relief="solid")
+                            result_label.pack(pady=20)
+                        else:
+                            result_label = Label(self.master, text="You lost to {}".format(self.new_match_history['matches'][0]['opponent_name']), font="normal 30 bold", bg="white", borderwidth=2, relief="solid")
+                            result_label.pack(pady=20)
+                    break
+            Button(self.master, text= "Play Again!", command=play_again).pack()
+            Button(self.master, text= "Logout", command=logout).pack()
+
+        def logout():
+            # for widget in self.master.winfo_children():
+            #     widget.pack_forget()
+            # self.bg_panel.pack(fill = 'both', expand = 'yes')
+            repository.logout(session)
+            new_game()
         
+        def play_again():
+            MainPage()
+            
+
         b1 = Button(self.master, text="Rock", font= ("yu gothic ui", 15))
         b2 = Button(self.master, text="Paper", font=("yu gothic ui", 15))
         b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 15))
+        b4 = Button(self.master, text="Select Option", command=select_button, font=("yu gothic ui", 15))
 
-        b1.place(x = 290, y = 200)
-        b2.place(x = 370, y = 200)
-        b3.place(x = 455, y = 200)
+        # self.master.configure(bg = "orange")
+        b1.place(x = 210, y = 200)
+        b2.place(x = 300, y = 200)
+        b3.place(x = 400, y = 200)
+        b4.place(x = 550, y = 200)
 
         #Score variables
         self.player1_score = 0
@@ -222,25 +294,28 @@ class Game :
                 video_label.after(10, update_frame)
 
             update_frame()
+    
 
-        # Update score function
-        def update_score(player):
-            print("Update")
+            
 
 
         # Add Labels, Frames, and Buttons
 
 
-        video_label = Label(self.master, width=400, height=400)
-        video_label.place(x = 220, y = 250)
+        # video_label = Label(self.master, width=400, height=400)
+        # video_label.place(x = 220, y = 250)
+
+
 
         # Start capturing video frames
-        capture_video()
+        # capture_video()
         self.master.mainloop()
 
-
+def new_game():
+    session = requests.session()
+    MainPage()
 # --- MAIN WINDOW ---
-global username 
+global username, session
 session = requests.session()
 MainPage()
 cv2.destroyAllWindows()
