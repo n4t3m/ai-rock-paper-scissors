@@ -107,8 +107,8 @@ class LoadingPage() :
         self.bg_panel.image = photo
         self.bg_panel.pack(fill = 'both', expand = 'yes')
 
-        self.Label0L = Label(self.load, text = "Waiting for other players...", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
-        self.Label0L.place(x = 70, y = 70)
+        self.Label0L = Label(self.load, text = "Waiting for other players...", font = ("yu gothic ui", 35, 'bold'), bg = '#ebe4d3', fg = 'black')
+        self.Label0L.place(x = 40, y = 70)
 
         loading_timer = threading.Timer(3, self.fun)
         loading_timer.start()
@@ -136,17 +136,17 @@ class Game :
 
         # ------ Labels and Buttons ------
 
-        self.frame = Frame(self.master, bg = '#ebe4d3', width = '580', height=180)
-        self.frame.place(x = 125, y = 60)
+        self.frame = Frame(self.master, bg = '#ebe4d3', width = '610', height=180)
+        self.frame.place(x = 100, y = 60)
 
         self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
-        self.GLabel.place(x = 125, y = 60) #300
+        self.GLabel.place(x = 100, y = 60) #300
 
         self.player1_score_label = Label(self.master, text="Wins: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
-        self.player1_score_label.place(x = 200, y = 150)
+        self.player1_score_label.place(x = 210, y = 150)
 
-        self.vs_label = Label(self.master, text="VS", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg ='black')
-        self.vs_label.place(x = 380, y = 200)
+        self.ties_label = Label(self.master, text="Ties: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg ='black')
+        self.ties_label.place(x = 340, y = 150)
 
         self.player2_score_label = Label(self.master, text="Losses: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3',  fg = 'black')
         self.player2_score_label.place(x = 450, y = 150)
@@ -160,11 +160,11 @@ class Game :
         self.b3 = Button(self.master, text="Scissors", font=("yu gothic ui", 15))
 
         self.b4 = Button(self.master, text="Play!", command = self.select, font=("yu gothic ui", 15))
-        self.b4.place(x = 540, y = 200)
+        self.b4.place(x = 550, y = 200)
 
-        self.b1.place(x = 290, y = 200)
-        self.b2.place(x = 370, y = 200)
-        self.b3.place(x = 455, y = 200)
+        self.b1.place(x = 250, y = 200)
+        self.b2.place(x = 330, y = 200)
+        self.b3.place(x = 420, y = 200)
 
         #Score variables
         self.player1_score = 0
