@@ -24,3 +24,10 @@ def make_choice(session, choice: str):
         "choice": choice
     })
     return r.status_code
+
+def retrieve_stats(session):
+    r = session.get(__endpoint_url__ + "/queuecheck")
+    if not r:
+        return None
+    r = r.json()
+    return r

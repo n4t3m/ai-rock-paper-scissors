@@ -142,13 +142,13 @@ class Game :
         self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
         self.GLabel.place(x = 125, y = 60) #300
 
-        self.player1_score_label = Label(self.master, text="Player 1: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
+        self.player1_score_label = Label(self.master, text="Wins: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
         self.player1_score_label.place(x = 200, y = 150)
 
         self.vs_label = Label(self.master, text="VS", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg ='black')
         self.vs_label.place(x = 380, y = 200)
 
-        self.player2_score_label = Label(self.master, text="Player 2: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3',  fg = 'black')
+        self.player2_score_label = Label(self.master, text="Losses: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3',  fg = 'black')
         self.player2_score_label.place(x = 450, y = 150)
 
         self.result_label = Label(self.master, text="", font="normal 20 bold", bg="white", width=15, borderwidth=2, relief="solid")
@@ -157,10 +157,10 @@ class Game :
         
         self.b1 = Button(self.master, text="Rock", font= ("yu gothic ui", 15))
         self.b2 = Button(self.master, text="Paper", font=("yu gothic ui", 15))
-        self.b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 15))
+        self.b3 = Button(self.master, text="Scissors", font=("yu gothic ui", 15))
 
-        self.b4 = Button(self.master, text="Stat", command = self.stat, font=("yu gothic ui", 15))
-        self.b4.place(x = 325, y = 200)
+        self.b4 = Button(self.master, text="Update Stats", command = self.update_score, font=("yu gothic ui", 15))
+        self.b4.place(x = 540, y = 200)
 
         self.b1.place(x = 290, y = 200)
         self.b2.place(x = 370, y = 200)
@@ -190,13 +190,6 @@ class Game :
         self.cap = cv2.VideoCapture(0)
         # self.capture_video()
         self.update_frame()
-
-    # def capture_video(self):
-    #     cap = cv2.VideoCapture(0)
-
-    #     # scheduler = BackgroundScheduler()
-    #     # make_choice_job = scheduler.add_job(repository.make_choice, args=(session, ""), trigger="interval", seconds=10)
-    #     # scheduler.start()
         
     def update_frame(self):
         print("here")
@@ -239,10 +232,16 @@ class Game :
 
     # Update score function
     def update_score(self, player):
-        print("Update")
+        res = repository.retrieve_stats(session)
+        self.player1_score_label.config(text=f"Wins: {res['wins']}")
+        self.player2_score_label.config(text=f"Losses: {res['losses']}")
+        # ties key also exists
+
     
-    def stat(self) :
-        print("Do")
+    # def stat(self):
+    #     res = repository.retrieve_stats(session)
+    #     label.config(text="Updated Text")
+
 
 
 # --- MAIN WINDOW ---
