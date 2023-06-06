@@ -275,3 +275,19 @@ def enqueue_choice():
 
     g.matchmaking_queue.put(player_choice(session['username'], c))
     return 'Success!', 200
+
+@rps_routes.route("/queuecheck", methods=["GET"])
+@login_required
+def check_queue():
+    '''Checks to see if user in queue'''
+    # they must be logged in so they must have a username
+    # ensure they have user record
+    res = getUserRecordFromUsername(session['username'])
+    if not res:
+        abort(400)
+
+    # check to see if they are already in queue
+    users_in_queue = [x.username for x in list(g.matchmaking_queue.queue)]
+    if session['username'] in users_in_queue:
+        abort(429) #429 is for rate limiting which is not exactly what is happening but lets just say its whats happening
+    return 'Success!', 200
