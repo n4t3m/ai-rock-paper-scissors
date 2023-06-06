@@ -69,13 +69,13 @@ class MainPage() :
 
     # Function to validate login credentials
     def validate_login(self):
-        res = repository.login(session, self.the_user, self.the_pass)
+        res = repository.login(session, self.the_user.get(), self.the_pass.get())
         # Check if username and password are correct
         if res == 200:
             self.main.destroy()
             LoadingPage()
         else:
-            self.bad_pass.place(x = 55, y = 330)
+            self.bad_pass.place(x = 50, y = 340)
     
     def register_user(self):
         username = self.the_user.get()
@@ -146,7 +146,7 @@ class Game :
         vs_label.place(x = 380, y = 200)
 
         player2_score_label = Label(self.master, text="Player 2: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3',  fg = 'black')
-        player2_score_label.place(x = 420, y = 150)
+        player2_score_label.place(x = 450, y = 150)
 
         result_label = Label(self.master, text="", font="normal 20 bold", bg="white", width=15, borderwidth=2, relief="solid")
         result_label.pack(pady=20)
@@ -155,6 +155,9 @@ class Game :
         b1 = Button(self.master, text="Rock", font= ("yu gothic ui", 15))
         b2 = Button(self.master, text="Paper", font=("yu gothic ui", 15))
         b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 15))
+
+        b4 = Button(self.master, text="Stat", command = stat, font=("yu gothic ui", 15))
+        b4.place(x = 325, y = 200)
 
         b1.place(x = 290, y = 200)
         b2.place(x = 370, y = 200)
@@ -226,6 +229,9 @@ class Game :
         # Update score function
         def update_score(player):
             print("Update")
+        
+        def stat() :
+            print("Do")
 
 
         # Add Labels, Frames, and Buttons
