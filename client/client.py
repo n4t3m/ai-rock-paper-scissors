@@ -70,6 +70,7 @@ class MainPage() :
     # Function to validate login credentials
     def validate_login(self):
         res = repository.login(session, self.the_user.get(), self.the_pass.get())
+        self.the_pass.set("")
         # Check if username and password are correct
         if res == 200:
             self.main.destroy()
@@ -80,6 +81,8 @@ class MainPage() :
     def register_user(self):
         username = self.the_user.get()
         password = self.the_pass.get()
+
+        self.the_pass.set("")
 
         res = repository.register(session, username, password)
 
@@ -156,7 +159,7 @@ class Game :
         b2 = Button(self.master, text="Paper", font=("yu gothic ui", 15))
         b3 = Button(self.master, text="Scissor", font=("yu gothic ui", 15))
 
-        b4 = Button(self.master, text="Stat", command = stat, font=("yu gothic ui", 15))
+        b4 = Button(self.master, text="Stat", command = self.stat, font=("yu gothic ui", 15))
         b4.place(x = 325, y = 200)
 
         b1.place(x = 290, y = 200)
