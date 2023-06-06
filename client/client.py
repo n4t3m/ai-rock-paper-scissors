@@ -215,7 +215,8 @@ class Game :
                             b2.configure(font='sans 16 bold', fg='red')
                         else:
                             b3.configure(font='sans 16 bold', fg='red')
-                        #make_choice_job.modify(args=(username, labels[inferred_result]))
+                        # TODO: Switch to button from scheduler
+                        # make_choice_job.modify(args=(username, labels[inferred_result]))
                         print(f"Inferred result: {labels[inferred_result]} with confidence {confidence*100}%")
 
                 video_label.after(10, update_frame)
