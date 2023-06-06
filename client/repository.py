@@ -14,7 +14,7 @@ def register(session, username: str, password: str) -> int:
         "username": username,
         "password": password
     })
-    return r.status_code, r.text
+    return (r.status_code, r.text)
 
 def make_choice(session, choice: str):
     if choice not in ["rock", "paper", "scissors"]:

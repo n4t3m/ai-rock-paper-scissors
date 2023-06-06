@@ -62,7 +62,7 @@ class MainPage() :
         self.label6 = Label(self.login_frame, text = "Register Here", font = ("yu gothic ui", 15), bg = '#fffded', fg = 'black')
         self.label6.place(x = 120, y = 380)
 
-        self.label7 = Button(self.login_frame, text= "Register", font = ("yu gothic ui", 15))
+        self.label7 = Button(self.login_frame, text= "Register", command = self.register_user, font = ("yu gothic ui", 15))
         self.label7.place(x = 130, y = 410)
 
         self.main.mainloop()
@@ -79,7 +79,7 @@ class MainPage() :
     
     def register_user(self):
         username = self.the_user.get()
-        password = self.the_user.get()
+        password = self.the_pass.get()
 
         res = repository.register(session, username, password)
 
