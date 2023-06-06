@@ -1,6 +1,6 @@
 import requests
 
-__endpoint_url__ = "http://localhost:5000" #TODO: Change to GCE IP once that is stable
+__endpoint_url__ = "http://34.135.237.61:5000" #TODO: Change to GCE IP once that is stable
 
 def login(session, username: str, password: str) -> int:
     r = session.post(__endpoint_url__ + "/login", {

@@ -19,7 +19,7 @@ class MainPage() :
 
         self.main = Tk()
         self.main.geometry("800x700")
-        self.main.title("Rock Paper Scissor Game")
+        self.main.title("Rock Paper Scissors Game")
         self.main.resizable(0,0)
 
         # ----- Background Image ----
@@ -97,7 +97,7 @@ class LoadingPage() :
     def __init__(self) :
         self.load = Tk()
         self.load.geometry("800x700")
-        self.load.title("Rock Paper Scissor Game")
+        self.load.title("Rock Paper Scissors Game")
         self.load.resizable(0,0)
 
         # ----- Background Image ----
@@ -139,7 +139,7 @@ class Game :
         self.frame = Frame(self.master, bg = '#ebe4d3', width = '610', height=180)
         self.frame.place(x = 100, y = 60)
 
-        self.GLabel = Label(self.master, text="Rock Paper Scissor", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
+        self.GLabel = Label(self.master, text="Rock Paper Scissors", font = ("yu gothic ui", 40, 'bold'), bg = '#ebe4d3', fg = 'black')
         self.GLabel.place(x = 100, y = 60) #300
 
         self.player1_score_label = Label(self.master, text="Wins: 0", font = ("yu gothic ui", 20), bg = '#ebe4d3', fg = 'black')
