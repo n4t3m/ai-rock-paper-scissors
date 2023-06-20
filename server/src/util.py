@@ -18,22 +18,23 @@ class player_choice:
 
 # Function to calculate the Probability
 # https://www.geeksforgeeks.org/elo-rating-algorithm/#
-def Probability(rating1, rating2):
+def _probability(rating1, rating2):
     return 1.0 * 1.0 / (1 + 1.0 * pow(10, 1.0 * (rating1 - rating2) / 400))
 
-def calculate_elo_change(Ra, Rb, winner):
-    Pb = Probability(Ra, Rb)
-    Pa = Probability(Rb, Ra)
+def calculate_elo_change(rating_a, rating_b, winner):
+    '''Function to calculate elo change given two initial ratings and a winner.'''
+    probability_b = _probability(rating_a, rating_b)
+    probablity_a = _probability(rating_b, rating_a)
 
     if str(winner) == "1":
-        Ra = Ra + 30 * (1 - Pa)
-        Rb = Rb + 30 * (0 - Pb)
+        rating_a = rating_a + 30 * (1 - probablity_a)
+        rating_b = rating_b + 30 * (0 - probability_b)
 
     else:
-        Ra = Ra + 30 * (0 - Pa)
-        Rb = Rb + 30 * (1 - Pb)
+        rating_a = rating_a + 30 * (0 - probablity_a)
+        rating_b = rating_b + 30 * (1 - probability_b)
 
-    return (int(Ra),int(Rb))
+    return (int(rating_a),int(rating_b))
 
 def getUserRecordFromUsername(username):
     '''Gets user record associated with username'''
