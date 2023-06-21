@@ -1,8 +1,9 @@
 '''Flask Configuration Config'''
 
 from os import urandom
-from flask_sqlalchemy import SQLAlchemy
 from queue import Queue
+
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
