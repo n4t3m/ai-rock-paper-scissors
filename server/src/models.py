@@ -1,9 +1,9 @@
 '''Database Models'''
 
 from datetime import datetime
+from uuid import uuid4
 
 from config import db
-from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
@@ -20,8 +20,18 @@ class User(db.Model):
 
     elo = db.Column(db.Integer, unique=False, nullable=False)
 
-    matches_as_player_one = db.relationship('MatchHistory', backref='player_one', foreign_keys='MatchHistory.player_one_id', lazy=True)
-    matches_as_player_two = db.relationship('MatchHistory', backref='player_two', foreign_keys='MatchHistory.player_two_id', lazy=True)
+    matches_as_player_one = db.relationship(
+        'MatchHistory',
+        backref='player_one',
+        foreign_keys='MatchHistory.player_one_id',
+        lazy=True
+    )
+    matches_as_player_two = db.relationship(
+        'MatchHistory',
+        backref='player_two',
+        foreign_keys='MatchHistory.player_two_id',
+        lazy=True
+    )
 
     avatar = db.Column(db.String(64), unique=False, nullable=True, default=None)
 
