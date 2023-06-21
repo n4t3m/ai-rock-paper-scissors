@@ -1,10 +1,16 @@
 '''This module contains API calls for the RPS Game'''
 
 from flask import Blueprint, session, abort, request, jsonify, g, current_app
-from queue import Queue
 
 from config import db
-from src.util import hello_world, calculate_elo_change, get_matches_from_username, get_user_from_username, PlayerChoice, get_recent_match_data
+from src.util import (
+    hello_world,
+    calculate_elo_change,
+    get_matches_from_username,
+    get_user_from_username,
+    PlayerChoice,
+    get_recent_match_data
+)
 from src.decorators import login_required
 from src.models import User, MatchHistory
 
@@ -49,7 +55,7 @@ def register():
         ))
         db.session.commit()
         return f"User {username} successfully created!"
-    except:
+    except Exception:
         # this handles all potential errors, including duplicate usernames
         abort(500, "An error has occured.") # todo, figure out better way to handle this
 
@@ -100,18 +106,21 @@ def protected_route():
 def init_match():
     '''Registration Route'''
 
-    playerOneID = request.form.get("player_one_id")
-    if not playerOneID:
+    player_one_id = request.form.get("player_one_id")
+    if not player_one_id:
         abort(400)
-    playerTwoID = request.form.get("player_two_id")
-    if not playerTwoID:
+    player_two_id = request.form.get("player_two_id")
+    if not player_two_id:
         abort(400)
 
     # Ensure Player is not in Match Already
 
     res = MatchHistory.query.filter(
         db.and_(
-            db.or_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerOneID),
+            db.or_(
+        MatchHistory.player_one_id==player_one_id,
+        MatchHistory.player_two_id==player_one_id
+        ),
             MatchHistory.winner=="0"
         )).first()
     if res:
@@ -119,25 +128,26 @@ def init_match():
 
     res = MatchHistory.query.filter(
         db.and_(
-            db.or_(MatchHistory.player_two_id==playerTwoID, MatchHistory.player_two_id==playerTwoID),
+            db.or_(
+        MatchHistory.player_two_id==player_two_id,
+        MatchHistory.player_two_id==player_two_id
+        ),
             MatchHistory.winner=="0"
         )).first()
     if res:
         return "Player 2 Already In Match"
-    
-    # TODO: Check to see if user reporting result was in match
 
     #try:
         # Create User in Database
-    m = MatchHistory(
-        player_one_id=playerOneID,
-        player_two_id=playerTwoID,
+    match_object = MatchHistory(
+        player_one_id=player_one_id,
+        player_two_id=player_two_id,
     )
-    db.session.add(m)
+    db.session.add(match_object)
     db.session.commit()
     return jsonify(
-        match_id=m.match_id,
-        match_creation_time=m.match_created
+        match_id=match_object.match_id,
+        match_creation_time=match_object.match_created
         )
     ##except:
         #abort(500)
@@ -149,11 +159,11 @@ def report_result_match():
 
     # TODO: Use Match ID for this route
 
-    playerOneID = request.form.get("player_one_id")
-    if not playerOneID:
+    player_one_id = request.form.get("player_one_id")
+    if not player_one_id:
         abort(400)
-    playerTwoID = request.form.get("player_two_id")
-    if not playerTwoID:
+    player_two_id = request.form.get("player_two_id")
+    if not player_two_id:
         abort(400)
     winner = str(request.form.get("winner"))
     if not winner or (winner!="1" and winner!="2"):
@@ -164,34 +174,43 @@ def report_result_match():
     res = MatchHistory.query.filter(
         db.and_(
             db.or_(
-                db.and_(MatchHistory.player_one_id==playerOneID, MatchHistory.player_two_id==playerTwoID),
-                db.and_(MatchHistory.player_one_id==playerTwoID, MatchHistory.player_two_id==playerOneID)
+                db.and_(
+        MatchHistory.player_one_id==player_one_id,
+        MatchHistory.player_two_id==player_two_id
+        ),
+                db.and_(
+        MatchHistory.player_one_id==player_two_id,
+        MatchHistory.player_two_id==player_one_id
+        )
             )),
             MatchHistory.winner=="0"
         ).first()
 
     if not res:
         return "Match Not Found"
-    
+
     # TODO: Check to see if user reporting result was in match
 
     try:
         res.winner = winner
-        res.player_one_final_elo, res.player_two_final_elo = calculate_elo_change(res.player_one_initial_elo, res.player_two_initial_elo, winner)
-        User.query.filter_by(id=playerOneID).first().elo = res.player_one_final_elo
-        User.query.filter_by(id=playerTwoID).first().elo = res.player_two_final_elo
+        res.player_one_final_elo, res.player_two_final_elo = calculate_elo_change(
+            res.player_one_initial_elo,
+            res.player_two_initial_elo, winner
+        )
+        User.query.filter_by(id=player_one_id).first().elo = res.player_one_final_elo
+        User.query.filter_by(id=player_two_id).first().elo = res.player_two_final_elo
         db.session.commit()
         return jsonify(
             winner=res.winner,
             match_id=res.match_id,
-            p1_username=User.query.get(playerOneID).username,
+            p1_username=User.query.get(player_one_id).username,
             p1_old_elo=res.player_one_initial_elo,
             p1_updated_elo=res.player_one_final_elo,
-            p2_username=User.query.get(playerTwoID).username,
+            p2_username=User.query.get(player_two_id).username,
             p2_old_elo=res.player_two_initial_elo,
             p2_updated_elo=res.player_two_final_elo,
         )
-    except:
+    except Exception:
         abort(500)
 
 @rps_routes.route("/match/me", methods=["GET"])
@@ -262,18 +281,18 @@ def enqueue_choice():
     # check to see if they are already in queue
     users_in_queue = [x.username for x in list(g.matchmaking_queue.queue)]
     if session['username'] in users_in_queue:
-        abort(429) #429 is for rate limiting which is not exactly what is happening but lets just say its whats happening
+        abort(429)
 
     # Ensure Choice is present
-    c = request.form.get("choice")
-    if not c:
+    user_choice = request.form.get("choice")
+    if not user_choice:
         abort(400)
 
-    c = c.lower()
-    if c not in ["rock", "paper", "scissors"]:
+    user_choice = user_choice.lower()
+    if user_choice not in ["rock", "paper", "scissors"]:
         abort(400)
 
-    g.matchmaking_queue.put(PlayerChoice(session['username'], c))
+    g.matchmaking_queue.put(PlayerChoice(session['username'], user_choice))
     return 'Success!', 200
 
 @rps_routes.route("/queuecheck", methods=["GET"])
@@ -289,5 +308,5 @@ def check_queue():
     # check to see if they are already in queue
     users_in_queue = [x.username for x in list(g.matchmaking_queue.queue)]
     if session['username'] in users_in_queue:
-        abort(429) #429 is for rate limiting which is not exactly what is happening but lets just say its whats happening
+        abort(429)
     return 'Success!', 200
