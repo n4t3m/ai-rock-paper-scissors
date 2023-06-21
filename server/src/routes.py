@@ -4,7 +4,7 @@ from flask import Blueprint, session, abort, request, jsonify, g, current_app
 from queue import Queue
 
 from config import db
-from src.util import hello_world, calculate_elo_change, getRecentMatchFromUsername,getUserRecordFromUsername, player_choice, getRecentMatchData
+from src.util import hello_world, calculate_elo_change, get_matches_from_username, get_user_from_username, PlayerChoice, get_recent_match_data
 from src.decorators import login_required
 from src.models import User, MatchHistory
 
@@ -198,7 +198,7 @@ def report_result_match():
 @login_required
 def my_last_match():
     '''Get Last Match Route'''
-    res = getRecentMatchFromUsername(session['username'])
+    res = get_matches_from_username(session['username'])
     if not res:
         return jsonify({'error': 'No Matches Played'}), 404
     ongoing = "True" if res.winner == "0" else "False"
@@ -221,10 +221,10 @@ def my_last_match():
 @login_required
 def my_match_stats():
     '''Get Match Stats'''
-    res = getRecentMatchFromUsername(session['username'])
+    res = get_matches_from_username(session['username'])
     if not res:
         return jsonify({'error': 'No Matches Played'}), 404
-    return jsonify(getRecentMatchData(session['username']))
+    return jsonify(get_recent_match_data(session['username']))
 
 @rps_routes.route("/match/<match_id>", methods=["GET"])
 @login_required
@@ -255,7 +255,7 @@ def enqueue_choice():
     '''Enqueues Result for Async Implementation'''
     # they must be logged in so they must have a username
     # ensure they have user record
-    res = getUserRecordFromUsername(session['username'])
+    res = get_user_from_username(session['username'])
     if not res:
         abort(400)
 
@@ -273,7 +273,7 @@ def enqueue_choice():
     if c not in ["rock", "paper", "scissors"]:
         abort(400)
 
-    g.matchmaking_queue.put(player_choice(session['username'], c))
+    g.matchmaking_queue.put(PlayerChoice(session['username'], c))
     return 'Success!', 200
 
 @rps_routes.route("/queuecheck", methods=["GET"])
@@ -282,7 +282,7 @@ def check_queue():
     '''Checks to see if user in queue'''
     # they must be logged in so they must have a username
     # ensure they have user record
-    res = getUserRecordFromUsername(session['username'])
+    res = get_user_from_username(session['username'])
     if not res:
         abort(400)
 

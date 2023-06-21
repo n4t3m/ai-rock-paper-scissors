@@ -10,7 +10,7 @@ def hello_world():
     return "Hello World!"
 
 # Will assume valid choice is passed into this
-class player_choice:
+class PlayerChoice:
     '''Player Choice Class for Matchmaking Queue'''
     def __init__(self, username, choice):
         self.username = username
@@ -36,14 +36,14 @@ def calculate_elo_change(rating_a, rating_b, winner):
 
     return (int(rating_a),int(rating_b))
 
-def getUserRecordFromUsername(username):
+def get_user_from_username(username):
     '''Gets user record associated with username'''
     res = User.query.filter_by(username=username).first()
     if not res:
         return None
     return res
 
-def getRecentMatchFromUsername(username):
+def get_matches_from_username(username):
     '''Gets most recent MatchHistory Object From Username'''
     res = User.query.filter_by(username=username).first()
     if not res:
@@ -55,7 +55,7 @@ def getRecentMatchFromUsername(username):
 
     return most_recent_match
 
-def getRecentMatchData(username) -> dict:
+def get_recent_match_data(username) -> dict:
     '''Returns up to 10 most recent matches'''
     res = User.query.filter_by(username=username).first()
     if not res:
@@ -176,7 +176,7 @@ def determine_rps_winner(p1_choice, p2_choice): #pylint: disable=R0911
 
     return None
 
-def playMatches(app):
+def play_matches(app):
     '''Logic to play all queued matches'''
     with app.app_context():
         while app.config['QUEUE'].qsize() >= 2:
