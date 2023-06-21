@@ -6,7 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from src.routes import rps_routes
 from src.models import User
-from src.util import playMatches
+from src.util import play_matches
 from config import FlaskConfig, db
 
 def create_app():
@@ -22,7 +22,7 @@ def create_app():
 
     # Init Match Scheduler
     scheduler = BackgroundScheduler()
-    scheduler.add_job(playMatches, 'interval', seconds=5, args=(app,))
+    scheduler.add_job(play_matches, 'interval', seconds=5, args=(app,))
     scheduler.start()
 
     # Initialize DB
